@@ -1,5 +1,5 @@
-# Build based on redis:6.0 from 2020-05-05
-FROM redis@sha256:f7ee67d8d9050357a6ea362e2a7e8b65a6823d9b612bc430d057416788ef6df9
+FROM redis/redis-stack-server:7.0.0-edge AS redis-stack-server
+FROM redis:7.0.5-bullseye
 
 LABEL maintainer="Johan Andersson <Grokzen@gmail.com>"
 
@@ -45,6 +45,12 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 COPY generate-supervisor-conf.sh /generate-supervisor-conf.sh
 
 RUN chmod 755 /docker-entrypoint.sh
+
+COPY --from=redis-stack-server /opt/redis-stack/lib/redisbloom.so /bin/redisbloom.so
+COPY --from=redis-stack-server /opt/redis-stack/lib/redisearch.so /bin/redisearch.so
+COPY --from=redis-stack-server /opt/redis-stack/lib/redisgraph.so /bin/redisgraph.so
+COPY --from=redis-stack-server /opt/redis-stack/lib/redistimeseries.so /bin/redistimeseries.so
+COPY --from=redis-stack-server /opt/redis-stack/lib/rejson.so /bin/rejson.so
 
 EXPOSE 7000 7001 7002 7003 7004 7005 7006 7007 5000 5001 5002
 
